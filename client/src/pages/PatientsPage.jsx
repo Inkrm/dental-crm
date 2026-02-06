@@ -1,0 +1,94 @@
+import { useEffect, useState } from "react";
+import { api } from "../api.js";
+import Card from "../components/Card.jsx";
+import Input from "../components/Input.jsx";
+import Button from "../components/Button.jsx";
+
+export default function PatientsPage() {
+  const [patients, setPatients] = useState([]);
+  const [q, setQ] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [error, setError] = useState("");
+
+  async function load() {
+    setError("");
+    try {
+      const data = await api(`/patients${q ? `?q=${encodeURIComponent(q)}` : ""}`);
+      setPatients(data);
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  useEffect(() => { load(); }, []);
+
+  async function addPatient(e) {
+    e.preventDefault();
+    setError("");
+    try {
+      await api("/patients", {
+        method: "POST",
+        body: JSON.stringify({ firstName, lastName, phone }),
+      });
+      setFirstName(""); setLastName(""); setPhone("");
+      await load();
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  return (
+    <div className="grid gap-4">
+      <Card
+        title="Pacienți"
+        subtitle="Creează și caută pacienți"
+        right={<Button onClick={load}>Refresh</Button>}
+      >
+        <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Caută după nume/telefon..." />
+          <Button onClick={load}>Caută</Button>
+        </div>
+
+        <hr className="m-4"/>
+
+        <form onSubmit={addPatient} className="mt-4 grid gap-3 md:grid-cols-4">
+            
+          <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Prenume" required />
+          <Input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Nume" required />
+          <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Telefon" />
+          <Button>Adaugă</Button>
+        </form>
+
+        {error && (
+          <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+            {error}
+          </div>
+        )}
+      </Card>
+
+
+      <Card title="Listă pacienți" subtitle={`${patients.length} rezultate`}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="text-white/60">
+              <tr className="border-b border-white/10">
+                <th className="py-2 text-left font-medium">Nume</th>
+                <th className="py-2 text-left font-medium">Telefon</th>
+              </tr>
+            </thead>
+            <tbody>
+              {patients.map((p) => (
+                <tr key={p.id} className="border-b border-white/5">
+                  <td className="py-2">{p.firstName} {p.lastName}</td>
+                  <td className="py-2 text-white/80">{p.phone || "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </div>
+  );
+}
