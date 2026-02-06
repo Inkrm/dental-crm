@@ -3,15 +3,18 @@ const API = "http://localhost:4000/api";
 export function setToken(token) {
   localStorage.setItem("accessToken", token);
 }
+
 export function getToken() {
   return localStorage.getItem("accessToken");
 }
+
 export function clearToken() {
   localStorage.removeItem("accessToken");
 }
 
 export async function api(path, options = {}) {
   const token = getToken();
+
   const res = await fetch(`${API}${path}`, {
     ...options,
     headers: {
@@ -21,26 +24,22 @@ export async function api(path, options = {}) {
     },
   });
 
-  const text = await res.text();
-  let data = {};
-  try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text }; }
-
-if (!res.ok) {
-  if (typeof data.error === "string") {
-    throw new Error(data.error);
+  // daca token expirat / invalid
+  if (res.status === 401) {
+    clearToken();
+    window.location.href = "/login";
+    return;
   }
 
-  // dacă vine eroare Zod
-  if (data.error?.fieldErrors) {
-    const messages = Object.values(data.error.fieldErrors)
-      .flat()
-      .join(", ");
-    throw new Error(messages || "Validation error");
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(
+      typeof data.error === "string"
+        ? data.error
+        : "Request failed"
+    );
   }
-
-  throw new Error("Request failed");
-}
-
 
   return data;
 }
