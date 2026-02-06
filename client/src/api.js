@@ -27,6 +27,7 @@ export async function api(path, options = {}) {
   // daca token expirat / invalid
   if (res.status === 401) {
     clearToken();
+    alert("Sesiunea a expirat. Te rugăm să te autentifici din nou.");
     window.location.href = "/login";
     return;
   }
