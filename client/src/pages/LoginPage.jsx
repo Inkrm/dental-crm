@@ -31,9 +31,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white grid place-items-center p-6">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl">
+      <div className="w-full max-w-md rounded-md border border-white/10 bg-white/5 p-6 shadow-xl">
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold">Dental CRM</h1>
+          <h1 className="text-5xl font-semibold">Dental CRM</h1>
           <p className="text-white/60 text-sm">Autentificare</p>
         </div>
 
@@ -60,7 +60,7 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-4 text-xs text-white/50">
-          Tip: folosește seed-ul (ex: <span className="text-white/70">admin@local.com / admin123</span>)
+          <span>Dacă ai uitat parola sau login-ul, adresează-te la administrație.</span>
         </div>
       </div>
     </div>

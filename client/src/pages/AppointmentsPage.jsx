@@ -16,7 +16,7 @@ function Badge({ status }) {
     CANCELLED: "bg-red-500/15 text-red-200",
   };
   return (
-    <span className={"inline-flex items-center rounded-lg px-2 py-1 text-xs border border-white/10 " + (map[status] || "bg-white/10")}>
+    <span className={"inline-flex items-center rounded-md px-2 py-1 text-xs border border-white/10 " + (map[status] || "bg-white/10")}>
       {status}
     </span>
   );
@@ -127,7 +127,7 @@ export default function AppointmentsPage() {
             <select
               value={patientId}
               onChange={(e) => setPatientId(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
+              className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
               required
             >
               {patients.map((p) => (
@@ -143,7 +143,7 @@ export default function AppointmentsPage() {
             <select
               value={doctorId}
               onChange={(e) => setDoctorId(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
+              className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
               required
             >
               {doctors.map((d) => (
@@ -174,7 +174,7 @@ export default function AppointmentsPage() {
           </div>
 
           {error && (
-            <div className="md:col-span-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+            <div className="md:col-span-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
               {error}
             </div>
           )}
@@ -186,7 +186,7 @@ export default function AppointmentsPage() {
           <select
             value={filterDoctor}
             onChange={(e) => setFilterDoctor(e.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
+            className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
           >
             <option value="ALL" className="bg-zinc-900">Toți doctorii</option>
             {doctors.map((d) => (
@@ -199,7 +199,7 @@ export default function AppointmentsPage() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
+            className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
           >
             <option value="ALL" className="bg-zinc-900">Toate statusurile</option>
             <option value="PLANNED" className="bg-zinc-900">PLANNED</option>
@@ -240,19 +240,19 @@ export default function AppointmentsPage() {
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => setStatus(a.id, "CONFIRMED")}
-                        className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
+                        className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
                       >
                         Confirm
                       </button>
                       <button
                         onClick={() => setStatus(a.id, "DONE")}
-                        className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
+                        className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
                       >
                         Done
                       </button>
                       <button
                         onClick={() => setStatus(a.id, "CANCELLED")}
-                        className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
+                        className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
                       >
                         Cancel
                       </button>

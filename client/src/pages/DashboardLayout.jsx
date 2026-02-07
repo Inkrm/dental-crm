@@ -24,7 +24,7 @@ export default function DashboardLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen bg-[#31314a] text-white">
       <div className="mx-auto max-w-6xl p-4 md:p-6 grid gap-4 md:grid-cols-[240px_1fr]">
         <aside className="rounded-2xl border border-white/10 bg-white/5 p-4">
           <div className="mb-4">
