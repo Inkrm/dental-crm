@@ -50,4 +50,44 @@ router.post("/", requireRole("ADMIN"), async (req, res) => {
   res.status(201).json(user);
 });
 
+const updateUserSchema = z.object({
+  fullName: z.string().min(1).optional().nullable(),
+  role: z.enum(["ADMIN", "DOCTOR", "RECEPTION"]).optional(),
+  password: z.string().min(6).optional(),
+});
+
+router.put("/:id", requireRole("ADMIN"), async (req, res) => {
+  const parsed = updateUserSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+
+  const u = await prisma.user.findUnique({ where: { id: req.params.id } });
+  if (!u) return res.status(404).json({ error: "Not found" });
+
+  const data = parsed.data;
+  const updateData = {
+    fullName: data.fullName === undefined ? undefined : data.fullName,
+    role: data.role,
+  };
+
+  if (data.password) {
+    updateData.passwordHash = await bcrypt.hash(data.password, 10);
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: u.id },
+    data: updateData,
+    select: { id: true, email: true, fullName: true, role: true },
+  });
+
+  res.json(updated);
+});
+
+router.delete("/:id", requireRole("ADMIN"), async (req, res) => {
+  const u = await prisma.user.findUnique({ where: { id: req.params.id } });
+  if (!u) return res.status(404).json({ error: "Not found" });
+
+  await prisma.user.delete({ where: { id: u.id } });
+  res.json({ ok: true });
+});
+
 export default router;

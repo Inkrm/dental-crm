@@ -6,7 +6,7 @@ export function requireAuth(req, res, next) {
   if (!token) return res.status(401).json({ error: "Missing token" });
 
   try {
-    req.user = verifyAccess(token); // { sub, role, email }
+    req.user = verifyAccess(token);
     next();
   } catch {
     return res.status(401).json({ error: "Invalid/expired token" });
