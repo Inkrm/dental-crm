@@ -11,17 +11,16 @@ const createSchema = z.object({
   doctorId: z.string().min(1),
   startTime: z.string().datetime(),
   endTime: z.string().datetime(),
-  reason: z.string().optional()
+  reason: z.string().optional(),
 });
 
 router.get("/", async (req, res) => {
-  const from = req.query.from ? new Date(req.query.from.toString()) : new Date(Date.now() - 7 * 864e5);
-  const to = req.query.to ? new Date(req.query.to.toString()) : new Date(Date.now() + 30 * 864e5);
-
   const items = await prisma.appointment.findMany({
-    where: { startTime: { gte: from }, endTime: { lte: to } },
-    include: { patient: true, doctor: { select: { id: true, email: true, fullName: true, role: true } } },
-    orderBy: { startTime: "asc" }
+    include: {
+      patient: true,
+      doctor: { select: { id: true, email: true, fullName: true, role: true } },
+    },
+    orderBy: { startTime: "asc" },
   });
 
   res.json(items);
@@ -29,26 +28,39 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   const parsed = createSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  if (!parsed.success)
+    return res.status(400).json({ error: parsed.error.flatten() });
 
   const { patientId, doctorId, startTime, endTime, reason } = parsed.data;
   const start = new Date(startTime);
   const end = new Date(endTime);
-  if (end <= start) return res.status(400).json({ error: "endTime must be after startTime" });
+  if (end <= start)
+    return res.status(400).json({ error: "endTime must be after startTime" });
 
   // overlap: start < existing.end AND end > existing.start
-  const overlap = await prisma.appointment.findFirst({
+  const items = await prisma.appointment.findMany({
     where: {
-      doctorId,
-      startTime: { lt: end },
-      endTime: { gt: start },
-      status: { not: "CANCELLED" }
-    }
+      startTime: { lt: to },
+      endTime: { gt: from },
+    },
+    include: {
+      patient: true,
+      doctor: { select: { id: true, email: true, fullName: true, role: true } },
+    },
+    orderBy: { startTime: "asc" },
   });
-  if (overlap) return res.status(409).json({ error: "Doctor is not available in that interval" });
+
+  if (overlap)
+    return res
+      .status(409)
+      .json({ error: "Doctor is not available in that interval" });
 
   const appt = await prisma.appointment.create({
-    data: { patientId, doctorId, startTime: start, endTime: end, reason }
+    data: { patientId, doctorId, startTime: start, endTime: end, reason },
+    include: {
+      patient: true,
+      doctor: { select: { id: true, email: true, fullName: true, role: true } },
+    },
   });
   res.status(201).json(appt);
 });
@@ -59,9 +71,12 @@ const statusSchema = z.object({
 
 router.patch("/:id/status", async (req, res) => {
   const parsed = statusSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  if (!parsed.success)
+    return res.status(400).json({ error: parsed.error.flatten() });
 
-  const appt = await prisma.appointment.findUnique({ where: { id: req.params.id } });
+  const appt = await prisma.appointment.findUnique({
+    where: { id: req.params.id },
+  });
   if (!appt) return res.status(404).json({ error: "Not found" });
 
   const updated = await prisma.appointment.update({
@@ -83,9 +98,12 @@ const updateApptSchema = z.object({
 
 router.put("/:id", async (req, res) => {
   const parsed = updateApptSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  if (!parsed.success)
+    return res.status(400).json({ error: parsed.error.flatten() });
 
-  const current = await prisma.appointment.findUnique({ where: { id: req.params.id } });
+  const current = await prisma.appointment.findUnique({
+    where: { id: req.params.id },
+  });
   if (!current) return res.status(404).json({ error: "Not found" });
 
   const data = parsed.data;
@@ -94,7 +112,8 @@ router.put("/:id", async (req, res) => {
   const start = data.startTime ? new Date(data.startTime) : current.startTime;
   const end = data.endTime ? new Date(data.endTime) : current.endTime;
 
-  if (end <= start) return res.status(400).json({ error: "endTime must be after startTime" });
+  if (end <= start)
+    return res.status(400).json({ error: "endTime must be after startTime" });
 
   // overlap check (exclude current)
   const overlap = await prisma.appointment.findFirst({
@@ -106,7 +125,10 @@ router.put("/:id", async (req, res) => {
       status: { not: "CANCELLED" },
     },
   });
-  if (overlap) return res.status(409).json({ error: "Doctor is not available in that interval" });
+  if (overlap)
+    return res
+      .status(409)
+      .json({ error: "Doctor is not available in that interval" });
 
   const updated = await prisma.appointment.update({
     where: { id: current.id },
@@ -121,12 +143,13 @@ router.put("/:id", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  const current = await prisma.appointment.findUnique({ where: { id: req.params.id } });
+  const current = await prisma.appointment.findUnique({
+    where: { id: req.params.id },
+  });
   if (!current) return res.status(404).json({ error: "Not found" });
 
   await prisma.appointment.delete({ where: { id: req.params.id } });
   res.json({ ok: true });
 });
-
 
 export default router;

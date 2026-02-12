@@ -5,7 +5,11 @@ import Input from "../components/Input.jsx";
 import Button from "../components/Button.jsx";
 
 function fmtLocal(dt) {
-  try { return new Date(dt).toLocaleString(); } catch { return dt; }
+  try {
+    return new Date(dt).toLocaleString();
+  } catch {
+    return dt;
+  }
 }
 
 function Badge({ status }) {
@@ -16,7 +20,12 @@ function Badge({ status }) {
     CANCELLED: "bg-red-500/15 text-red-200",
   };
   return (
-    <span className={"inline-flex items-center rounded-md px-2 py-1 text-xs border border-white/10 " + (map[status] || "bg-white/10")}>
+    <span
+      className={
+        "inline-flex items-center rounded-md px-2 py-1 text-xs border border-white/10 " +
+        (map[status] || "bg-white/10")
+      }
+    >
       {status}
     </span>
   );
@@ -27,6 +36,8 @@ export default function AppointmentsPage() {
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [error, setError] = useState("");
+  const [patientQuery, setPatientQuery] = useState("");
+  const [patientOpen, setPatientOpen] = useState(false);
 
   // form
   const [patientId, setPatientId] = useState("");
@@ -59,9 +70,14 @@ export default function AppointmentsPage() {
     }
   }
 
-  useEffect(() => { loadAll(); }, []);
+  useEffect(() => {
+    loadAll();
+  }, []);
 
-  const canSubmit = useMemo(() => patientId && doctorId && startTime && endTime, [patientId, doctorId, startTime, endTime]);
+  const canSubmit = useMemo(
+    () => patientId && doctorId && startTime && endTime,
+    [patientId, doctorId, startTime, endTime],
+  );
 
   async function createAppointment(e) {
     e.preventDefault();
@@ -80,7 +96,7 @@ export default function AppointmentsPage() {
       setReason("");
       await loadAll();
     } catch (e) {
-      setError(e.message); // overlap -> 409
+      setError(e.message);
     }
   }
 
@@ -104,8 +120,10 @@ export default function AppointmentsPage() {
 
       if (filterText.trim()) {
         const t = filterText.toLowerCase();
-        const p = `${a.patient?.firstName || ""} ${a.patient?.lastName || ""} ${a.patient?.phone || ""}`.toLowerCase();
-        const d = `${a.doctor?.fullName || ""} ${a.doctor?.email || ""}`.toLowerCase();
+        const p =
+          `${a.patient?.firstName || ""} ${a.patient?.lastName || ""} ${a.patient?.phone || ""}`.toLowerCase();
+        const d =
+          `${a.doctor?.fullName || ""} ${a.doctor?.email || ""}`.toLowerCase();
         const r = `${a.reason || ""}`.toLowerCase();
         if (!p.includes(t) && !d.includes(t) && !r.includes(t)) return false;
       }
@@ -114,6 +132,18 @@ export default function AppointmentsPage() {
     });
   }, [items, filterDoctor, filterStatus, filterText]);
 
+  const patientResults = useMemo(() => {
+    const t = patientQuery.trim().toLowerCase();
+    if (!t) return patients.slice(0, 8);
+
+    return patients
+      .filter((p) => {
+        const s = `${p.firstName} ${p.lastName} ${p.phone || ""}`.toLowerCase();
+        return s.includes(t);
+      })
+      .slice(0, 8);
+  }, [patients, patientQuery]);
+
   return (
     <div className="grid gap-4">
       <Card
@@ -121,21 +151,65 @@ export default function AppointmentsPage() {
         subtitle="Creează programări + verificare suprapuneri"
         right={<Button onClick={loadAll}>Refresh</Button>}
       >
-        <form onSubmit={createAppointment} className="grid gap-3 md:grid-cols-2">
-          <div>
+        <form
+          onSubmit={createAppointment}
+          className="grid gap-3 md:grid-cols-2"
+        >
+          <div className="relative">
             <div className="text-xs text-white/70 mb-1">Pacient</div>
-            <select
-              value={patientId}
-              onChange={(e) => setPatientId(e.target.value)}
-              className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
-              required
-            >
-              {patients.map((p) => (
-                <option key={p.id} value={p.id} className="bg-zinc-900">
-                  {p.firstName} {p.lastName} {p.phone ? `(${p.phone})` : ""}
-                </option>
-              ))}
-            </select>
+
+            {patientId && (
+              <div className="mb-2 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm">
+                <div className="text-white/90">
+                  {(() => {
+                    const p = patients.find((x) => x.id === patientId);
+                    return p
+                      ? `${p.firstName} ${p.lastName}`
+                      : "Pacient selectat";
+                  })()}
+                </div>
+                <div className="text-xs text-white/50">
+                  {patients.find((x) => x.id === patientId)?.phone || ""}
+                </div>
+              </div>
+            )}
+
+            <Input
+              value={patientQuery}
+              onChange={(e) => {
+                setPatientQuery(e.target.value);
+                setPatientOpen(true);
+              }}
+              onFocus={() => setPatientOpen(true)}
+              onBlur={() => setTimeout(() => setPatientOpen(false), 150)}
+              placeholder="Caută pacient (nume/telefon)..."
+              className="h-10"
+            />
+
+            {patientOpen && patientResults.length > 0 && (
+              <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto rounded-md border border-white/10 bg-zinc-900 shadow-lg">
+                {patientResults.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => {
+                      setPatientId(p.id);
+                      setPatientQuery("");
+                      setPatientOpen(false);
+                    }}
+                    className={
+                      "w-full text-left px-3 py-2 text-sm hover:bg-white/10 " +
+                      (p.id === patientId ? "bg-white/10" : "")
+                    }
+                  >
+                    <div className="text-white/90">
+                      {p.firstName} {p.lastName}
+                    </div>
+                    <div className="text-xs text-white/50">{p.phone || ""}</div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>
@@ -156,17 +230,31 @@ export default function AppointmentsPage() {
 
           <div>
             <div className="text-xs text-white/70 mb-1">Start</div>
-            <Input type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
+            <Input
+              type="datetime-local"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              required
+            />
           </div>
 
           <div>
             <div className="text-xs text-white/70 mb-1">End</div>
-            <Input type="datetime-local" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
+            <Input
+              type="datetime-local"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              required
+            />
           </div>
 
           <div className="md:col-span-2">
             <div className="text-xs text-white/70 mb-1">Motiv (opțional)</div>
-            <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="ex: consult, carie..." />
+            <Input
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="ex: consult, carie..."
+            />
           </div>
 
           <div className="md:col-span-2">
@@ -188,7 +276,9 @@ export default function AppointmentsPage() {
             onChange={(e) => setFilterDoctor(e.target.value)}
             className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
           >
-            <option value="ALL" className="bg-zinc-900">Toți doctorii</option>
+            <option value="ALL" className="bg-zinc-900">
+              Toți doctorii
+            </option>
             {doctors.map((d) => (
               <option key={d.id} value={d.id} className="bg-zinc-900">
                 {d.fullName || d.email}
@@ -201,14 +291,28 @@ export default function AppointmentsPage() {
             onChange={(e) => setFilterStatus(e.target.value)}
             className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
           >
-            <option value="ALL" className="bg-zinc-900">Toate statusurile</option>
-            <option value="PLANNED" className="bg-zinc-900">PLANNED</option>
-            <option value="CONFIRMED" className="bg-zinc-900">CONFIRMED</option>
-            <option value="DONE" className="bg-zinc-900">DONE</option>
-            <option value="CANCELLED" className="bg-zinc-900">CANCELLED</option>
+            <option value="ALL" className="bg-zinc-900">
+              Toate statusurile
+            </option>
+            <option value="PLANNED" className="bg-zinc-900">
+              PLANNED
+            </option>
+            <option value="CONFIRMED" className="bg-zinc-900">
+              CONFIRMED
+            </option>
+            <option value="DONE" className="bg-zinc-900">
+              DONE
+            </option>
+            <option value="CANCELLED" className="bg-zinc-900">
+              CANCELLED
+            </option>
           </select>
 
-          <Input value={filterText} onChange={(e) => setFilterText(e.target.value)} placeholder="Nume/Prenume" />
+          <Input
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+            placeholder="Nume/Prenume"
+          />
         </div>
       </Card>
 
@@ -231,11 +335,17 @@ export default function AppointmentsPage() {
                   <td className="py-2">{fmtLocal(a.startTime)}</td>
                   <td className="py-2">
                     {a.patient?.firstName} {a.patient?.lastName}
-                    <div className="text-xs text-white/50">{a.patient?.phone || ""}</div>
+                    <div className="text-xs text-white/50">
+                      {a.patient?.phone || ""}
+                    </div>
                   </td>
-                  <td className="py-2">{a.doctor?.fullName || a.doctor?.email}</td>
+                  <td className="py-2">
+                    {a.doctor?.fullName || a.doctor?.email}
+                  </td>
                   <td className="py-2 text-white/80">{a.reason || "-"}</td>
-                  <td className="py-2"><Badge status={a.status} /></td>
+                  <td className="py-2">
+                    <Badge status={a.status} />
+                  </td>
                   <td className="py-2">
                     <div className="flex flex-wrap gap-2">
                       <button
