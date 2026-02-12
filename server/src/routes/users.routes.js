@@ -18,7 +18,13 @@ router.get("/doctors", async (req, res) => {
 
 router.get("/", requireRole("ADMIN"), async (req, res) => {
   const users = await prisma.user.findMany({
-    select: { id: true, email: true, fullName: true, role: true, createdAt: true },
+    select: {
+      id: true,
+      email: true,
+      fullName: true,
+      role: true,
+      createdAt: true,
+    },
     orderBy: { createdAt: "desc" },
   });
   res.json(users);
@@ -33,7 +39,8 @@ const createUserSchema = z.object({
 
 router.post("/", requireRole("ADMIN"), async (req, res) => {
   const parsed = createUserSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  if (!parsed.success)
+    return res.status(400).json({ error: parsed.error.flatten() });
 
   const { email, password, role, fullName } = parsed.data;
 
@@ -58,7 +65,8 @@ const updateUserSchema = z.object({
 
 router.put("/:id", requireRole("ADMIN"), async (req, res) => {
   const parsed = updateUserSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  if (!parsed.success)
+    return res.status(400).json({ error: parsed.error.flatten() });
 
   const u = await prisma.user.findUnique({ where: { id: req.params.id } });
   if (!u) return res.status(404).json({ error: "Not found" });
@@ -83,9 +91,34 @@ router.put("/:id", requireRole("ADMIN"), async (req, res) => {
 });
 
 router.delete("/:id", requireRole("ADMIN"), async (req, res) => {
-  const u = await prisma.user.findUnique({ where: { id: req.params.id } });
+  const targetId = req.params.id;
+
+  // 1) nu ștergi contul curent
+  const currentUserId = req.user?.id || req.user?.userId || req.user?.sub;
+  if (currentUserId && String(currentUserId) === String(targetId)) {
+    return res
+      .status(400)
+      .json({ error: "You cannot delete your own account" });
+  }
+
+  const u = await prisma.user.findUnique({ where: { id: targetId } });
   if (!u) return res.status(404).json({ error: "Not found" });
 
+  // 2) nu ștergi ultimul admin
+  if (u.role === "ADMIN") {
+    const adminCount = await prisma.user.count({ where: { role: "ADMIN" } });
+    if (adminCount <= 1) {
+      return res.status(400).json({ error: "Cannot delete the last ADMIN" });
+    }
+  }
+  if (u.role === "ADMIN" && data.role && data.role !== "ADMIN") {
+    const adminCount = await prisma.user.count({ where: { role: "ADMIN" } });
+    if (adminCount <= 1) {
+      return res
+        .status(400)
+        .json({ error: "Cannot change role of the last ADMIN" });
+    }
+  }
   await prisma.user.delete({ where: { id: u.id } });
   res.json({ ok: true });
 });

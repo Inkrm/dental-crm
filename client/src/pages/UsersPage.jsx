@@ -4,10 +4,148 @@ import Card from "../components/Card.jsx";
 import Input from "../components/Input.jsx";
 import Button from "../components/Button.jsx";
 
+function UserRow({ u, onChanged, onError }) {
+  const [editing, setEditing] = useState(false);
+
+  const [fullName, setFullName] = useState(u.fullName || "");
+  const [role, setRole] = useState(u.role);
+  const [password, setPassword] = useState("");
+
+  async function save() {
+    try {
+      const body = {};
+      // fullName: trimiți doar dacă vrei să-l schimbi
+      body.fullName = fullName.trim() ? fullName.trim() : null;
+      body.role = role;
+      if (password.trim()) body.password = password.trim();
+
+      await api(`/users/${u.id}`, {
+        method: "PUT",
+        body: JSON.stringify(body),
+      });
+
+      setPassword("");
+      setEditing(false);
+      onChanged();
+    } catch (e) {
+      onError(e.message);
+    }
+  }
+
+  function cancel() {
+    setFullName(u.fullName || "");
+    setRole(u.role);
+    setPassword("");
+    setEditing(false);
+  }
+
+  async function del() {
+    if (!confirm(`Ștergi utilizatorul ${u.email}?`)) return;
+    try {
+      await api(`/users/${u.id}`, { method: "DELETE" });
+      onChanged();
+    } catch (e) {
+      onError(e.message);
+    }
+  }
+
+  return (
+    <tr className="border-b border-white/5">
+      <td className="py-2">{u.email}</td>
+
+      <td className="py-2 text-white/80">
+        {editing ? (
+          <input
+            className="w-full max-w-xs rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-white outline-none"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Nume complet"
+          />
+        ) : (
+          u.fullName || "-"
+        )}
+      </td>
+
+      <td className="py-2">
+        {editing ? (
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-white outline-none"
+          >
+            <option className="bg-zinc-900" value="ADMIN">ADMIN</option>
+            <option className="bg-zinc-900" value="DOCTOR">DOCTOR</option>
+            <option className="bg-zinc-900" value="RECEPTION">RECEPTION</option>
+          </select>
+        ) : (
+          u.role
+        )}
+      </td>
+
+      <td className="py-2">
+        {editing ? (
+          <input
+            className="w-full max-w-xs rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-white outline-none"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Parolă nouă (opțional)"
+            type="password"
+          />
+        ) : (
+          <span className="text-white/50 text-xs">—</span>
+        )}
+      </td>
+
+      <td className="py-2">
+        <div className="flex flex-wrap gap-2">
+          {!editing ? (
+            <>
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
+              >
+                Edit
+              </button>
+
+              <button
+                type="button"
+                onClick={del}
+                className="rounded-md border border-red-500/30 bg-red-500/10 px-2 py-1 text-xs text-red-200 hover:bg-red-500/15"
+              >
+                Delete
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={save}
+                className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs text-emerald-200 hover:bg-emerald-500/15"
+              >
+                Save
+              </button>
+
+              <button
+                type="button"
+                onClick={cancel}
+                className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
+              >
+                Cancel
+              </button>
+            </>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+}
+
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
 
+  // Create form (POST /users)
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("DOCTOR");
@@ -17,7 +155,7 @@ export default function UsersPage() {
     setError("");
     try {
       const data = await api("/users");
-      setUsers(data);
+      setUsers(Array.isArray(data) ? data : []);
     } catch (e) {
       setError(e.message);
     }
@@ -31,9 +169,18 @@ export default function UsersPage() {
     try {
       await api("/users", {
         method: "POST",
-        body: JSON.stringify({ email, fullName, role, password }),
+        body: JSON.stringify({
+          email,
+          password,
+          role,
+          fullName: fullName.trim() ? fullName.trim() : undefined,
+        }),
       });
-      setEmail(""); setFullName(""); setRole("DOCTOR"); setPassword("");
+
+      setEmail("");
+      setFullName("");
+      setRole("DOCTOR");
+      setPassword("");
       await load();
     } catch (e) {
       setError(e.message);
@@ -42,29 +189,49 @@ export default function UsersPage() {
 
   return (
     <div className="grid gap-4">
-      <Card title="Utilizatori" subtitle="Doar ADMIN poate crea conturi" right={<Button onClick={load}>Refresh</Button>}>
+      <Card
+        title="Utilizatori"
+        subtitle="ADMIN creează / editează / șterge"
+        right={<Button onClick={load}>Refresh</Button>}
+      >
         <form onSubmit={createUser} className="grid gap-3 md:grid-cols-4">
-          <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@domain.com" required />
-          <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Nume complet" />
+          <Input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="email@domain.com"
+            required
+          />
+
+          <Input
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Nume complet (opțional)"
+          />
 
           <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
+            className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
           >
-            <option value="DOCTOR" className="bg-zinc-900">DOCTOR</option>
-            <option value="RECEPTION" className="bg-zinc-900">RECEPTION</option>
-            <option value="ADMIN" className="bg-zinc-900">ADMIN</option>
+            <option className="bg-zinc-900" value="DOCTOR">DOCTOR</option>
+            <option className="bg-zinc-900" value="RECEPTION">RECEPTION</option>
+            <option className="bg-zinc-900" value="ADMIN">ADMIN</option>
           </select>
 
-          <Input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Parolă (min 6)" type="password" required />
+          <Input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Parolă (min 6)"
+            type="password"
+            required
+          />
 
           <div className="md:col-span-4">
             <Button>Creează utilizator</Button>
           </div>
 
           {error && (
-            <div className="md:col-span-4 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+            <div className="md:col-span-4 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
               {error}
             </div>
           )}
@@ -79,15 +246,13 @@ export default function UsersPage() {
                 <th className="py-2 text-left font-medium">Email</th>
                 <th className="py-2 text-left font-medium">Nume</th>
                 <th className="py-2 text-left font-medium">Rol</th>
+                <th className="py-2 text-left font-medium">Reset parolă</th>
+                <th className="py-2 text-left font-medium">Acțiuni</th>
               </tr>
             </thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u.id} className="border-b border-white/5">
-                  <td className="py-2">{u.email}</td>
-                  <td className="py-2 text-white/80">{u.fullName || "-"}</td>
-                  <td className="py-2">{u.role}</td>
-                </tr>
+                <UserRow key={u.id} u={u} onChanged={load} onError={setError} />
               ))}
             </tbody>
           </table>
