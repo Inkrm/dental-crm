@@ -93,7 +93,6 @@ router.put("/:id", requireRole("ADMIN"), async (req, res) => {
 router.delete("/:id", requireRole("ADMIN"), async (req, res) => {
   const targetId = req.params.id;
 
-  // 1) nu ștergi contul curent
   const currentUserId = req.user?.id || req.user?.userId || req.user?.sub;
   if (currentUserId && String(currentUserId) === String(targetId)) {
     return res
@@ -104,7 +103,6 @@ router.delete("/:id", requireRole("ADMIN"), async (req, res) => {
   const u = await prisma.user.findUnique({ where: { id: targetId } });
   if (!u) return res.status(404).json({ error: "Not found" });
 
-  // 2) nu ștergi ultimul admin
   if (u.role === "ADMIN") {
     const adminCount = await prisma.user.count({ where: { role: "ADMIN" } });
     if (adminCount <= 1) {

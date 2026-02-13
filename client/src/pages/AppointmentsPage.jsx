@@ -5,6 +5,7 @@ import Input from "../components/Input.jsx";
 import Button from "../components/Button.jsx";
 
 function fmtLocal(dt) {
+  // formateaza data in format local, cu fallback
   try {
     return new Date(dt).toLocaleString();
   } catch {
@@ -13,6 +14,7 @@ function fmtLocal(dt) {
 }
 
 function Badge({ status }) {
+  // mapeaza statusul la stiluri vizuale
   const map = {
     PLANNED: "bg-white/10 text-white/80",
     CONFIRMED: "bg-blue-500/15 text-blue-200",
@@ -32,6 +34,7 @@ function Badge({ status }) {
 }
 
 export default function AppointmentsPage() {
+  // stare pentru date si erori
   const [items, setItems] = useState([]);
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
@@ -52,6 +55,7 @@ export default function AppointmentsPage() {
   const [filterText, setFilterText] = useState("");
 
   async function loadAll() {
+    // incarca programari, pacienti si doctori
     setError("");
     try {
       const [appts, pats, docs] = await Promise.all([
@@ -71,15 +75,18 @@ export default function AppointmentsPage() {
   }
 
   useEffect(() => {
+    // initializare date la montare
     loadAll();
   }, []);
 
+  // verifica daca formularul poate fi trimis
   const canSubmit = useMemo(
     () => patientId && doctorId && startTime && endTime,
     [patientId, doctorId, startTime, endTime],
   );
 
   async function createAppointment(e) {
+    // trimite cererea de creare programare
     e.preventDefault();
     setError("");
     try {
@@ -101,6 +108,7 @@ export default function AppointmentsPage() {
   }
 
   async function setStatus(id, status) {
+    // actualizeaza statusul programarii
     setError("");
     try {
       await api(`/appointments/${id}/status`, {
@@ -114,6 +122,7 @@ export default function AppointmentsPage() {
   }
 
   const filtered = useMemo(() => {
+    // filtreaza programarile dupa criterii
     return items.filter((a) => {
       if (filterDoctor !== "ALL" && a.doctorId !== filterDoctor) return false;
       if (filterStatus !== "ALL" && a.status !== filterStatus) return false;
@@ -133,6 +142,7 @@ export default function AppointmentsPage() {
   }, [items, filterDoctor, filterStatus, filterText]);
 
   const patientResults = useMemo(() => {
+    // sugestii pacienti pentru autocomplete
     const t = patientQuery.trim().toLowerCase();
     if (!t) return patients.slice(0, 8);
 

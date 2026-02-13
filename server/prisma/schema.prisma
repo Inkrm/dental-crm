@@ -1,23 +1,27 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// schema prisma pentru modele si relatii
+// documentatie: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// optimizare interogari cu prisma accelerate
+// https://pris.ly/cli/accelerate-init
 generator client {
+  // clientul generat pentru prisma
   provider = "prisma-client-js"
 }
 datasource db {
+  // configurarea conexiunii la baza de date
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 
+// rolurile utilizatorilor din sistem
 enum Role {
   ADMIN
   DOCTOR
   RECEPTION
 }
 
+// statusurile posibile ale programarilor
 enum AppointmentStatus {
   PLANNED
   CONFIRMED
@@ -25,6 +29,7 @@ enum AppointmentStatus {
   DONE
 }
 
+// utilizatorii aplicatiei
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -38,6 +43,7 @@ model User {
   refreshTokens      RefreshToken[]
 }
 
+// tokenurile de refresh pentru sesiuni
 model RefreshToken {
   id        String   @id @default(cuid())
   tokenHash String
@@ -48,6 +54,7 @@ model RefreshToken {
   expiresAt DateTime
 }
 
+// pacientii gestionati de aplicatie
 model Patient {
   id        String   @id @default(cuid())
   firstName String
@@ -62,6 +69,7 @@ model Patient {
   appointments Appointment[]
 }
 
+// programarile pacientilor cu doctorii
 model Appointment {
   id        String            @id @default(cuid())
   patientId String

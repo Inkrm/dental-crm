@@ -5,13 +5,17 @@ import Input from "../components/Input.jsx";
 import Button from "../components/Button.jsx";
 
 export default function LoginPage() {
+  // navigare dupa autentificare
   const nav = useNavigate();
+  // valori implicite pentru demo
   const [email, setEmail] = useState("admin@local.com"); // email valid!
   const [password, setPassword] = useState("admin123");
+  // stare pentru mesaje si incarcare
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e) {
+    // trimite cererea de login
     e.preventDefault();
     setError("");
     setLoading(true);

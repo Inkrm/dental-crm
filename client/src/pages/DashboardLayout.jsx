@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { clearToken } from "../api.js";
 
 function Item({ to, children }) {
+  // element de navigare cu stil activ
   return (
     <NavLink
       to={to}
@@ -16,9 +17,11 @@ function Item({ to, children }) {
 }
 
 export default function DashboardLayout() {
+  // navigare programatica pentru redirect
   const nav = useNavigate();
 
   function logout() {
+    // sterge tokenul si redirectioneaza la login
     clearToken();
     nav("/login");
   }
@@ -29,7 +32,7 @@ export default function DashboardLayout() {
         <aside className="rounded-2xl border border-white/10 bg-white/5 p-4">
           <div className="mb-4">
             <div className="text-lg font-semibold">DENTAL CRM</div>
-            <div className="text-xs text-white/50">Admin / Recepție / Doctor</div>
+            <div className="text-xs text-white/50">Sistem de Management</div>
           </div>
 
           <nav className="grid gap-2">

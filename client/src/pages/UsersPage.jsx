@@ -5,6 +5,7 @@ import Input from "../components/Input.jsx";
 import Button from "../components/Button.jsx";
 
 function UserRow({ u, onChanged, onError }) {
+  // rand utilizator cu editare locala
   const [editing, setEditing] = useState(false);
 
   const [fullName, setFullName] = useState(u.fullName || "");
@@ -12,9 +13,10 @@ function UserRow({ u, onChanged, onError }) {
   const [password, setPassword] = useState("");
 
   async function save() {
+    // salveaza modificarile utilizatorului
     try {
       const body = {};
-      // fullName: trimiți doar dacă vrei să-l schimbi
+      // fullname: trimiti doar daca vrei sa-l schimbi
       body.fullName = fullName.trim() ? fullName.trim() : null;
       body.role = role;
       if (password.trim()) body.password = password.trim();
@@ -33,6 +35,7 @@ function UserRow({ u, onChanged, onError }) {
   }
 
   function cancel() {
+    // revine la valorile initiale
     setFullName(u.fullName || "");
     setRole(u.role);
     setPassword("");
@@ -40,6 +43,7 @@ function UserRow({ u, onChanged, onError }) {
   }
 
   async function del() {
+    // sterge utilizatorul dupa confirmare
     if (!confirm(`Ștergi utilizatorul ${u.email}?`)) return;
     try {
       await api(`/users/${u.id}`, { method: "DELETE" });
@@ -142,16 +146,18 @@ function UserRow({ u, onChanged, onError }) {
 }
 
 export default function UsersPage() {
+  // stare pentru lista si erori
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
 
-  // Create form (POST /users)
+  // formular creare (post /users)
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("DOCTOR");
   const [password, setPassword] = useState("");
 
   async function load() {
+    // incarca lista de utilizatori
     setError("");
     try {
       const data = await api("/users");
@@ -161,9 +167,13 @@ export default function UsersPage() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    // initializare lista la montare
+    load();
+  }, []);
 
   async function createUser(e) {
+    // creeaza un utilizator nou
     e.preventDefault();
     setError("");
     try {

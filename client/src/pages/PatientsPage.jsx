@@ -5,6 +5,7 @@ import Input from "../components/Input.jsx";
 import Button from "../components/Button.jsx";
 
 export default function PatientsPage() {
+  // stare pentru lista si formular
   const [patients, setPatients] = useState([]);
   const [q, setQ] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -13,6 +14,7 @@ export default function PatientsPage() {
   const [error, setError] = useState("");
 
   async function load() {
+    // incarca lista de pacienti cu filtrare optionala
     setError("");
     try {
       const data = await api(
@@ -25,10 +27,12 @@ export default function PatientsPage() {
   }
 
   useEffect(() => {
+    // initializare lista la montare
     load();
   }, []);
 
   async function addPatient(e) {
+    // creeaza un pacient nou
     e.preventDefault();
     setError("");
     try {
@@ -46,12 +50,14 @@ export default function PatientsPage() {
   }
 
   function Row({ p, onChanged, onError }) {
+    // componenta locala pentru editare pacient (nefolosita momentan)
     const [editing, setEditing] = useState(false);
     const [firstName, setFirstName] = useState(p.firstName);
     const [lastName, setLastName] = useState(p.lastName);
     const [phone, setPhone] = useState(p.phone || "");
 
     async function save() {
+      // salveaza modificarile pacientului
       try {
         await api(`/patients/${p.id}`, {
           method: "PUT",
@@ -65,6 +71,7 @@ export default function PatientsPage() {
     }
 
     function cancel() {
+      // revine la valorile initiale
       setFirstName(p.firstName);
       setLastName(p.lastName);
       setPhone(p.phone || "");
@@ -74,6 +81,7 @@ export default function PatientsPage() {
   }
 
   async function del(id) {
+    // sterge pacientul dupa confirmare
     if (!confirm("Ștergi pacientul?")) return;
     setError("");
     try {

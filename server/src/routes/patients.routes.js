@@ -5,6 +5,7 @@ import { requireAuth } from "../middleware/auth.js";
 
 const router = Router();
 
+// schema de validare pentru creare pacient
 const createSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
@@ -14,9 +15,11 @@ const createSchema = z.object({
   notes: z.string().optional()
 });
 
+// aplica autentificarea pentru toate rutele de pacienti
 router.use(requireAuth);
 
 router.get("/", async (req, res) => {
+  // filtreaza pacientii dupa query, daca exista
   const q = (req.query.q || "").toString();
   const patients = await prisma.patient.findMany({
     where: q
@@ -33,10 +36,12 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  // valideaza payloadul de creare
   const parsed = createSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
 
   const data = parsed.data;
+  // creeaza pacientul si converteste data nasterii
   const patient = await prisma.patient.create({
     data: { ...data, dob: data.dob ? new Date(data.dob) : null }
   });
@@ -44,11 +49,13 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
+  // cauta pacientul dupa id
   const patient = await prisma.patient.findUnique({ where: { id: req.params.id } });
   if (!patient) return res.status(404).json({ error: "Not found" });
   res.json(patient);
 });
 
+// schema de validare pentru update pacient
 const updateSchema = z.object({
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),
@@ -59,13 +66,16 @@ const updateSchema = z.object({
 });
 
 router.put("/:id", async (req, res) => {
+  // valideaza payloadul de update
   const parsed = updateSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
 
+  // verifica existenta pacientului
   const exists = await prisma.patient.findUnique({ where: { id: req.params.id } });
   if (!exists) return res.status(404).json({ error: "Not found" });
 
   const data = parsed.data;
+  // actualizeaza pacientul si normalizeaza data nasterii
   const patient = await prisma.patient.update({
     where: { id: req.params.id },
     data: {
@@ -77,9 +87,11 @@ router.put("/:id", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
+  // verifica existenta pacientului
   const exists = await prisma.patient.findUnique({ where: { id: req.params.id } });
   if (!exists) return res.status(404).json({ error: "Not found" });
 
+  // sterge pacientul
   await prisma.patient.delete({ where: { id: req.params.id } });
   res.json({ ok: true });
 });
