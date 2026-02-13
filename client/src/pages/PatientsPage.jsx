@@ -156,9 +156,11 @@ export default function PatientsPage() {
                   </td>
                   <td className="py-2 text-white/80">{p.phone || "-"}</td>
                   <td className="py-2">
-                    <Button onClick={() => del(p.id)}>
+                    <button onClick={() => del(p.id)}
+                    className="rounded-md border border-red-500/30 bg-red-500/10 px-2 py-1 text-xs text-red-200 hover:bg-red-500/15"  
+                    >
                       Șterge
-                    </Button>
+                    </button>
                   </td>
                 </tr>
               ))}

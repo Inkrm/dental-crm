@@ -109,7 +109,7 @@ function UserRow({ u, onChanged, onError }) {
                 onClick={() => setEditing(true)}
                 className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
               >
-                Edit
+                Editează
               </button>
 
               <button
@@ -117,7 +117,7 @@ function UserRow({ u, onChanged, onError }) {
                 onClick={del}
                 className="rounded-md border border-red-500/30 bg-red-500/10 px-2 py-1 text-xs text-red-200 hover:bg-red-500/15"
               >
-                Delete
+                Șterge
               </button>
             </>
           ) : (
@@ -127,7 +127,7 @@ function UserRow({ u, onChanged, onError }) {
                 onClick={save}
                 className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs text-emerald-200 hover:bg-emerald-500/15"
               >
-                Save
+                Salvează
               </button>
 
               <button
@@ -135,7 +135,7 @@ function UserRow({ u, onChanged, onError }) {
                 onClick={cancel}
                 className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
               >
-                Cancel
+                Anulează
               </button>
             </>
           )}

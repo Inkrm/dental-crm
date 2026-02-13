@@ -305,16 +305,16 @@ export default function AppointmentsPage() {
               Toate statusurile
             </option>
             <option value="PLANNED" className="bg-zinc-900">
-              PLANNED
+              PLANIFICAT
             </option>
             <option value="CONFIRMED" className="bg-zinc-900">
-              CONFIRMED
+              CONFIRMAT
             </option>
             <option value="DONE" className="bg-zinc-900">
-              DONE
+              FINALIZAT
             </option>
             <option value="CANCELLED" className="bg-zinc-900">
-              CANCELLED
+              ANULAT
             </option>
           </select>
 
@@ -359,19 +359,19 @@ export default function AppointmentsPage() {
                   onClick={() => setStatus(a.id, "CONFIRMED")}
                   className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
                 >
-                  Confirm
+                  Confirmat
                 </button>
                 <button
                   onClick={() => setStatus(a.id, "DONE")}
                   className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
                 >
-                  Done
+                  Finalizat
                 </button>
                 <button
                   onClick={() => setStatus(a.id, "CANCELLED")}
                   className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
                 >
-                  Cancel
+                  Anulat
                 </button>
               </div>
             </div>
@@ -414,19 +414,19 @@ export default function AppointmentsPage() {
                         onClick={() => setStatus(a.id, "CONFIRMED")}
                         className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
                       >
-                        Confirm
+                        Confirmat
                       </button>
                       <button
                         onClick={() => setStatus(a.id, "DONE")}
                         className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
                       >
-                        Done
+                        Finalizat
                       </button>
                       <button
                         onClick={() => setStatus(a.id, "CANCELLED")}
                         className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
                       >
-                        Cancel
+                        Anulat
                       </button>
                     </div>
                   </td>
