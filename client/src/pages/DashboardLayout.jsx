@@ -45,7 +45,7 @@ export default function DashboardLayout() {
             onClick={logout}
             className="mt-6 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/80 hover:bg-white/10"
           >
-            Logout
+            Ieșire
           </button>
         </aside>
 
