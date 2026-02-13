@@ -357,19 +357,19 @@ export default function AppointmentsPage() {
               <div className="mt-3 flex flex-wrap gap-2">
                 <button
                   onClick={() => setStatus(a.id, "CONFIRMED")}
-                  className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
+                  className="rounded-md border border-white/10 bg-white/5 px-4 py-2 text-xs hover:bg-white/10"
                 >
                   Confirmat
                 </button>
                 <button
                   onClick={() => setStatus(a.id, "DONE")}
-                  className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
+                  className="rounded-md border border-white/10 bg-white/5 px-4 py-2 text-xs hover:bg-white/10"
                 >
                   Finalizat
                 </button>
                 <button
                   onClick={() => setStatus(a.id, "CANCELLED")}
-                  className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
+                  className="rounded-md border border-white/10 bg-white/5 px-4 py-2 text-xs hover:bg-white/10"
                 >
                   Anulat
                 </button>

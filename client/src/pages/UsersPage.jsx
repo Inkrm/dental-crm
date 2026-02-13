@@ -145,6 +145,139 @@ function UserRow({ u, onChanged, onError }) {
   );
 }
 
+function UserCard({ u, onChanged, onError }) {
+  const [editing, setEditing] = useState(false);
+  const [fullName, setFullName] = useState(u.fullName || "");
+  const [role, setRole] = useState(u.role);
+  const [password, setPassword] = useState("");
+
+  async function save() {
+    try {
+      const body = {};
+      body.fullName = fullName.trim() ? fullName.trim() : null;
+      body.role = role;
+      if (password.trim()) body.password = password.trim();
+
+      await api(`/users/${u.id}`, {
+        method: "PUT",
+        body: JSON.stringify(body),
+      });
+
+      setPassword("");
+      setEditing(false);
+      onChanged();
+    } catch (e) {
+      onError(e.message);
+    }
+  }
+
+  function cancel() {
+    setFullName(u.fullName || "");
+    setRole(u.role);
+    setPassword("");
+    setEditing(false);
+  }
+
+  async function del() {
+    if (!confirm(`Ștergi utilizatorul ${u.email}?`)) return;
+    try {
+      await api(`/users/${u.id}`, { method: "DELETE" });
+      onChanged();
+    } catch (e) {
+      onError(e.message);
+    }
+  }
+
+  return (
+    <div className="rounded-md border border-white/10 bg-white/5 p-3">
+      <div className="text-sm text-white/90">{u.email}</div>
+
+      <div className="mt-2 text-sm">
+        {editing ? (
+          <input
+            className="w-full rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-white outline-none"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Nume complet"
+          />
+        ) : (
+          u.fullName || "-"
+        )}
+      </div>
+
+      <div className="mt-2 text-sm">
+        {editing ? (
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-white outline-none"
+          >
+            <option className="bg-zinc-900" value="ADMIN">ADMIN</option>
+            <option className="bg-zinc-900" value="DOCTOR">DOCTOR</option>
+            <option className="bg-zinc-900" value="RECEPTION">RECEPTION</option>
+          </select>
+        ) : (
+          u.role
+        )}
+      </div>
+
+      <div className="mt-2 text-sm">
+        {editing ? (
+          <input
+            className="w-full rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-white outline-none"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Parolă nouă (opțional)"
+            type="password"
+          />
+        ) : (
+          <span className="text-white/50 text-xs">Reset parolă: —</span>
+        )}
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        {!editing ? (
+          <>
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="rounded-md border border-white/10 bg-white/5 px-4 py-2 text-xs hover:bg-white/10"
+            >
+              Editează
+            </button>
+
+            <button
+              type="button"
+              onClick={del}
+              className="rounded-md border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs text-red-200 hover:bg-red-500/15"
+            >
+              Șterge
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={save}
+              className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-xs text-emerald-200 hover:bg-emerald-500/15"
+            >
+              Salvează
+            </button>
+
+            <button
+              type="button"
+              onClick={cancel}
+              className="rounded-md border border-white/10 bg-white/5 px-4 py-2 text-xs hover:bg-white/10"
+            >
+              Anulează
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function UsersPage() {
   // stare pentru lista si erori
   const [users, setUsers] = useState([]);
@@ -249,7 +382,13 @@ export default function UsersPage() {
       </Card>
 
       <Card title="Listă utilizatori" subtitle={`${users.length} conturi`}>
-        <div className="overflow-x-auto">
+        <div className="md:hidden grid gap-2">
+          {users.map((u) => (
+            <UserCard key={u.id} u={u} onChanged={load} onError={setError} />
+          ))}
+        </div>
+
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="text-white/60">
               <tr className="border-b border-white/10">
