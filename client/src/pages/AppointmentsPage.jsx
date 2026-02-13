@@ -327,6 +327,7 @@ export default function AppointmentsPage() {
       </Card>
 
       <Card title="Listă programări" subtitle={`${filtered.length} rezultate`}>
+        {/* mobil */}
         <div className="md:hidden grid gap-2">
           {filtered.map((a) => (
             <div
@@ -377,6 +378,7 @@ export default function AppointmentsPage() {
           ))}
         </div>
 
+        {/* desktop */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="text-white/60">
