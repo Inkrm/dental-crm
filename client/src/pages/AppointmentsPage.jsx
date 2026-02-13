@@ -327,7 +327,57 @@ export default function AppointmentsPage() {
       </Card>
 
       <Card title="Listă programări" subtitle={`${filtered.length} rezultate`}>
-        <div className="overflow-x-auto">
+        <div className="md:hidden grid gap-2">
+          {filtered.map((a) => (
+            <div
+              key={a.id}
+              className="rounded-md border border-white/10 bg-white/5 p-3"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-sm">{fmtLocal(a.startTime)}</div>
+                <Badge status={a.status} />
+              </div>
+
+              <div className="mt-2 text-sm text-white/90">
+                {a.patient?.firstName} {a.patient?.lastName}
+              </div>
+              <div className="text-xs text-white/50">
+                {a.patient?.phone || ""}
+              </div>
+
+              <div className="mt-2 text-sm">
+                {a.doctor?.fullName || a.doctor?.email}
+              </div>
+
+              <div className="mt-2 text-sm text-white/80">
+                {a.reason || "-"}
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  onClick={() => setStatus(a.id, "CONFIRMED")}
+                  className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
+                >
+                  Confirm
+                </button>
+                <button
+                  onClick={() => setStatus(a.id, "DONE")}
+                  className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
+                >
+                  Done
+                </button>
+                <button
+                  onClick={() => setStatus(a.id, "CANCELLED")}
+                  className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="text-white/60">
               <tr className="border-b border-white/10">
