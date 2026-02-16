@@ -85,3 +85,7 @@ html[data-theme="light"] [class*="bg-zinc-900"] {
   background-color: #ffffff !important;
   color: #111827 !important;
 }
+
+html[data-theme="light"] .nav-item:not(.is-active) .nav-icon {
+  background: transparent !important;
+}

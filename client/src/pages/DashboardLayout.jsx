@@ -9,7 +9,8 @@ function Item({ to, children }) {
     <NavLink
       to={to}
       className={({ isActive }) =>
-        "flex items-center gap-2 rounded-xl px-3 py-2 text-sm " +
+        "nav-item flex items-center gap-2 rounded-xl px-3 py-2 text-sm " +
+        (isActive ? "is-active " : "") +
         (isActive ? "bg-white text-black" : "text-white/80 hover:bg-white/10")
       }
     >
@@ -60,28 +61,28 @@ export default function DashboardLayout() {
 
           <nav className="grid gap-2">
             <Item to="/patients">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
+              <span className="nav-icon inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
                 <img src="/icons/customer.png" alt="" className="h-5 w-5" />
               </span>
               Pacienți
             </Item>
 
             <Item to="/appointments">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
+              <span className="nav-icon inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
                 <img src="/icons/event.png" alt="" className="h-5 w-5" />
               </span>
               Programări
             </Item>
 
             <Item to="/users">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
+              <span className="nav-icon inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
                 <img src="/icons/user.png" alt="" className="h-5 w-5" />
               </span>
               Utilizatori
             </Item>
 
             <Item to="/options">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
+              <span className="nav-icon inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
                 <img src="/icons/setting.png" alt="" className="h-5 w-5" />
               </span>
               Setări
