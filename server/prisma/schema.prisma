@@ -4,8 +4,9 @@
 // optimizare interogari cu prisma accelerate
 // https://pris.ly/cli/accelerate-init
 generator client {
-  // clientul generat pentru prisma
   provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+
 }
 datasource db {
   // configurarea conexiunii la baza de date

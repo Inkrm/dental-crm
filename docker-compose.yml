@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:16
+    container_name: dentalcrm-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dentalcrm
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d dentalcrm"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: dentalcrm-server
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/dentalcrm?schema=public
+
+      JWT_ACCESS_SECRET: change-me-access
+      JWT_REFRESH_SECRET: change-me-refresh
+      ACCESS_TOKEN_TTL: 4h
+      REFRESH_TOKEN_TTL: 30d
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: dentalcrm-client
+    environment:
+      VITE_API_URL: /api
+      VITE_PROXY_TARGET: http://server:4000
+    depends_on:
+      - server
+    ports:
+      - "5173:5173"
+
+volumes:
+  pgdata:

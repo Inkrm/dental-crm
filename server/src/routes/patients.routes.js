@@ -65,7 +65,7 @@ const updateSchema = z.object({
   notes: z.string().optional().nullable(),
 });
 
-router.put("/:id", async (req, res) => {
+async function updatePatient(req, res) {
   // valideaza payloadul de update
   const parsed = updateSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
@@ -84,7 +84,10 @@ router.put("/:id", async (req, res) => {
     },
   });
   res.json(patient);
-});
+}
+
+router.put("/:id", updatePatient);
+router.patch("/:id", updatePatient);
 
 router.delete("/:id", async (req, res) => {
   // verifica existenta pacientului

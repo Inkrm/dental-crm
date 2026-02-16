@@ -24,5 +24,6 @@ app.use("/api/patients", patientRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/users", usersRoutes);
 
-const port = process.env.PORT || 4000;
-app.listen(port, () => console.log(`API on http://localhost:${port}`));
+app.listen(process.env.PORT || 4000, "0.0.0.0", () => {
+  console.log("API on http://localhost:" + (process.env.PORT || 4000));
+});

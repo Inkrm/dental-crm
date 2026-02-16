@@ -4,6 +4,122 @@ import Card from "../components/Card.jsx";
 import Input from "../components/Input.jsx";
 import Button from "../components/Button.jsx";
 
+function PatientRow({ p, onChanged, onError, onDelete }) {
+  const [editing, setEditing] = useState(false);
+  const [firstName, setFirstName] = useState(p.firstName);
+  const [lastName, setLastName] = useState(p.lastName);
+  const [phone, setPhone] = useState(p.phone || "");
+
+  useEffect(() => {
+    setFirstName(p.firstName);
+    setLastName(p.lastName);
+    setPhone(p.phone || "");
+  }, [p.id, p.firstName, p.lastName, p.phone]);
+
+  async function save() {
+    try {
+      await api(`/patients/${p.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          phone: phone.trim() || null,
+        }),
+      });
+      setEditing(false);
+      onChanged();
+    } catch (e) {
+      onError(e.message);
+    }
+  }
+
+  function cancel() {
+    setFirstName(p.firstName);
+    setLastName(p.lastName);
+    setPhone(p.phone || "");
+    setEditing(false);
+  }
+
+  return (
+    <tr className="border-b border-white/5">
+      <td className="py-2">
+        {!editing ? (
+          `${p.firstName} ${p.lastName}`
+        ) : (
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Input
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="Prenume"
+              className="py-1.5 text-xs"
+            />
+            <Input
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Nume"
+              className="py-1.5 text-xs"
+            />
+          </div>
+        )}
+      </td>
+      <td className="py-2 text-white/80">
+        {!editing ? (
+          p.phone || "-"
+        ) : (
+          <Input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="Telefon"
+            className="max-w-xs py-1.5 text-xs"
+          />
+        )}
+      </td>
+      <td className="py-2">
+        {!editing ? (
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              className="px-2 py-1 text-xs"
+              onClick={() => setEditing(true)}
+            >
+              Editează
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              className="px-2 py-1 text-xs"
+              onClick={() => onDelete(p.id)}
+            >
+              Șterge
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="success"
+              className="px-2 py-1 text-xs"
+              onClick={save}
+              disabled={!firstName.trim() || !lastName.trim()}
+            >
+              Salvează
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="px-2 py-1 text-xs"
+              onClick={cancel}
+            >
+              Anulează
+            </Button>
+          </div>
+        )}
+      </td>
+    </tr>
+  );
+}
+
 export default function PatientsPage() {
   // stare pentru lista si formular
   const [patients, setPatients] = useState([]);
@@ -47,37 +163,6 @@ export default function PatientsPage() {
     } catch (e) {
       setError(e.message);
     }
-  }
-
-  function Row({ p, onChanged, onError }) {
-    // componenta locala pentru editare pacient (nefolosita momentan)
-    const [editing, setEditing] = useState(false);
-    const [firstName, setFirstName] = useState(p.firstName);
-    const [lastName, setLastName] = useState(p.lastName);
-    const [phone, setPhone] = useState(p.phone || "");
-
-    async function save() {
-      // salveaza modificarile pacientului
-      try {
-        await api(`/patients/${p.id}`, {
-          method: "PUT",
-          body: JSON.stringify({ firstName, lastName, phone }),
-        });
-        setEditing(false);
-        onChanged();
-      } catch (e) {
-        onError(e.message);
-      }
-    }
-
-    function cancel() {
-      // revine la valorile initiale
-      setFirstName(p.firstName);
-      setLastName(p.lastName);
-      setPhone(p.phone || "");
-      setEditing(false);
-    }
-
   }
 
   async function del(id) {
@@ -150,19 +235,13 @@ export default function PatientsPage() {
             </thead>
             <tbody>
               {patients.map((p) => (
-                <tr key={p.id} className="border-b border-white/5">
-                  <td className="py-2">
-                    {p.firstName} {p.lastName}
-                  </td>
-                  <td className="py-2 text-white/80">{p.phone || "-"}</td>
-                  <td className="py-2">
-                    <button onClick={() => del(p.id)}
-                    className="rounded-md border border-red-500/30 bg-red-500/10 px-2 py-1 text-xs text-red-200 hover:bg-red-500/15"  
-                    >
-                      Șterge
-                    </button>
-                  </td>
-                </tr>
+                <PatientRow
+                  key={p.id}
+                  p={p}
+                  onChanged={load}
+                  onError={setError}
+                  onDelete={del}
+                />
               ))}
             </tbody>
           </table>
