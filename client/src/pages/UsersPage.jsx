@@ -113,7 +113,7 @@ function UserRow({ u, onChanged, onError }) {
               </Button>
 
               <Button
-                variant="warning"
+                variant="danger"
                 type="button"
                 onClick={del}
               >
