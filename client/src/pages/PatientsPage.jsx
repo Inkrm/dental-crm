@@ -42,7 +42,7 @@ function PatientRow({ p, onChanged, onError, onDelete }) {
 
   return (
     <tr className="border-b border-white/5">
-      <td className="py-2">
+      <td className="py-2 pr-4">
         {!editing ? (
           `${p.firstName} ${p.lastName}`
         ) : (
@@ -62,7 +62,7 @@ function PatientRow({ p, onChanged, onError, onDelete }) {
           </div>
         )}
       </td>
-      <td className="py-2 text-white/80">
+      <td className="px-4 py-2 text-white/80">
         {!editing ? (
           p.phone || "-"
         ) : (
@@ -74,12 +74,12 @@ function PatientRow({ p, onChanged, onError, onDelete }) {
           />
         )}
       </td>
-      <td className="py-2">
+      <td className="py-2 pl-4">
         {!editing ? (
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
-              variant="secondary"
+              variant="warning"
               className="px-2 py-1 text-xs"
               onClick={() => setEditing(true)}
             >
@@ -107,7 +107,7 @@ function PatientRow({ p, onChanged, onError, onDelete }) {
             </Button>
             <Button
               type="button"
-              variant="ghost"
+              variant="warning"
               className="px-2 py-1 text-xs"
               onClick={cancel}
             >
@@ -228,9 +228,9 @@ export default function PatientsPage() {
           <table className="w-full text-sm">
             <thead className="text-white/60">
               <tr className="border-b border-white/10">
-                <th className="py-2 text-left font-medium">Nume</th>
-                <th className="py-2 text-left font-medium">Telefon</th>
-                <th className="py-2 text-left font-medium">Acțiuni</th>
+                <th className="py-2 pr-4 text-left font-medium">Nume</th>
+                <th className="px-4 py-2 text-left font-medium">Telefon</th>
+                <th className="py-2 pl-4 text-left font-medium">Acțiuni</th>
               </tr>
             </thead>
             <tbody>

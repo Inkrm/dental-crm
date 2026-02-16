@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { clearToken } from "../api.js";
+import { api, clearToken } from "../api.js";
+import { applyThemeMode, clearStoredThemeMode } from "../theme.js";
 
 function Item({ to, children }) {
   // element de navigare cu stil activ
@@ -20,16 +22,35 @@ export default function DashboardLayout() {
   // navigare programatica pentru redirect
   const nav = useNavigate();
 
+  useEffect(() => {
+    let active = true;
+    async function loadMeTheme() {
+      try {
+        const me = await api("/users/me");
+        if (!active) return;
+        applyThemeMode(me.themeMode || "SYSTEM");
+      } catch {
+        // noop: fallback pe tema deja aplicata local
+      }
+    }
+    loadMeTheme();
+    return () => {
+      active = false;
+    };
+  }, []);
+
   function logout() {
     // sterge tokenul si redirectioneaza la login
     clearToken();
+    clearStoredThemeMode();
+    applyThemeMode("SYSTEM");
     nav("/login");
   }
 
   return (
-    <div className="min-h-screen bg-[#31314a] text-white">
+    <div className="app-shell min-h-screen text-white">
       <div className="mx-auto p-4 md:p-6 grid gap-4 md:grid-cols-[240px_1fr]">
-        <aside className="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <aside className="panel rounded-2xl p-4">
           <div className="mb-4 flex items-start justify-between">
             <div>
               <div className="text-lg font-semibold">DENTAL CRM</div>
@@ -75,7 +96,7 @@ export default function DashboardLayout() {
           </button>
         </aside>
 
-        <main className="rounded-2xl border border-white/10 bg-white/5 p-4 md:p-6">
+        <main className="panel rounded-2xl p-4 md:p-6">
           <Outlet />
         </main>
       </div>

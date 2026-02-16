@@ -11,7 +11,14 @@ router.get("/me", async (req, res) => {
   const userId = req.user?.sub;
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, email: true, fullName: true, role: true, createdAt: true },
+    select: {
+      id: true,
+      email: true,
+      fullName: true,
+      role: true,
+      themeMode: true,
+      createdAt: true,
+    },
   });
 
   if (!user) return res.status(404).json({ error: "Not found" });
@@ -21,6 +28,7 @@ router.get("/me", async (req, res) => {
 const updateMeSchema = z.object({
   fullName: z.string().min(1).optional().nullable(),
   password: z.string().min(6).optional(),
+  themeMode: z.enum(["SYSTEM", "LIGHT", "DARK"]).optional(),
 });
 
 router.put("/me", async (req, res) => {
@@ -35,6 +43,7 @@ router.put("/me", async (req, res) => {
   const data = parsed.data;
   const updateData = {
     fullName: data.fullName === undefined ? undefined : data.fullName,
+    themeMode: data.themeMode,
   };
 
   if (data.password) {
@@ -44,7 +53,7 @@ router.put("/me", async (req, res) => {
   const updated = await prisma.user.update({
     where: { id: me.id },
     data: updateData,
-    select: { id: true, email: true, fullName: true, role: true },
+    select: { id: true, email: true, fullName: true, role: true, themeMode: true },
   });
 
   res.json(updated);
@@ -66,6 +75,7 @@ router.get("/", requireRole("ADMIN"), async (req, res) => {
       email: true,
       fullName: true,
       role: true,
+      themeMode: true,
       createdAt: true,
     },
     orderBy: { createdAt: "desc" },
@@ -78,6 +88,7 @@ const createUserSchema = z.object({
   password: z.string().min(6),
   role: z.enum(["ADMIN", "DOCTOR", "RECEPTION"]),
   fullName: z.string().min(1).optional(),
+  themeMode: z.enum(["SYSTEM", "LIGHT", "DARK"]).optional(),
 });
 
 router.post("/", requireRole("ADMIN"), async (req, res) => {
@@ -85,7 +96,7 @@ router.post("/", requireRole("ADMIN"), async (req, res) => {
   if (!parsed.success)
     return res.status(400).json({ error: parsed.error.flatten() });
 
-  const { email, password, role, fullName } = parsed.data;
+  const { email, password, role, fullName, themeMode } = parsed.data;
 
   const exists = await prisma.user.findUnique({ where: { email } });
   if (exists) return res.status(409).json({ error: "Email already exists" });
@@ -93,8 +104,14 @@ router.post("/", requireRole("ADMIN"), async (req, res) => {
   const passwordHash = await bcrypt.hash(password, 10);
 
   const user = await prisma.user.create({
-    data: { email, passwordHash, role, fullName: fullName || null },
-    select: { id: true, email: true, fullName: true, role: true },
+    data: {
+      email,
+      passwordHash,
+      role,
+      fullName: fullName || null,
+      themeMode: themeMode || undefined,
+    },
+    select: { id: true, email: true, fullName: true, role: true, themeMode: true },
   });
 
   res.status(201).json(user);
@@ -104,6 +121,7 @@ const updateUserSchema = z.object({
   fullName: z.string().min(1).optional().nullable(),
   role: z.enum(["ADMIN", "DOCTOR", "RECEPTION"]).optional(),
   password: z.string().min(6).optional(),
+  themeMode: z.enum(["SYSTEM", "LIGHT", "DARK"]).optional(),
 });
 
 router.put("/:id", requireRole("ADMIN"), async (req, res) => {
@@ -118,6 +136,7 @@ router.put("/:id", requireRole("ADMIN"), async (req, res) => {
   const updateData = {
     fullName: data.fullName === undefined ? undefined : data.fullName,
     role: data.role,
+    themeMode: data.themeMode,
   };
 
   if (data.password) {
@@ -127,7 +146,7 @@ router.put("/:id", requireRole("ADMIN"), async (req, res) => {
   const updated = await prisma.user.update({
     where: { id: u.id },
     data: updateData,
-    select: { id: true, email: true, fullName: true, role: true },
+    select: { id: true, email: true, fullName: true, role: true, themeMode: true },
   });
 
   res.json(updated);

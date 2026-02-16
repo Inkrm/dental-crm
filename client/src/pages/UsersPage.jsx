@@ -105,7 +105,7 @@ function UserRow({ u, onChanged, onError }) {
           {!editing ? (
             <>
               <Button
-                variant="secondary"
+                variant="warning"
                 type="button"
                 onClick={() => setEditing(true)}
               >

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api, setToken } from "../api.js";
 import Input from "../components/Input.jsx";
 import Button from "../components/Button.jsx";
+import { applyThemeMode } from "../theme.js";
 
 export default function LoginPage() {
   // navigare dupa autentificare
@@ -25,6 +26,7 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
       setToken(data.accessToken);
+      applyThemeMode(data.user?.themeMode || "SYSTEM");
       nav("/patients");
     } catch (err) {
       setError(err.message);

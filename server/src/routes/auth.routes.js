@@ -41,7 +41,16 @@ router.post("/login", async (req, res) => {
     }
   });
 
-  res.json({ accessToken: access, refreshToken: refresh, user: { id: user.id, email: user.email, role: user.role } });
+  res.json({
+    accessToken: access,
+    refreshToken: refresh,
+    user: {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      themeMode: user.themeMode,
+    },
+  });
 });
 
 router.post("/refresh", async (req, res) => {

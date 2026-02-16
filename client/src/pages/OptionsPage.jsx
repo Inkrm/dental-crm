@@ -3,6 +3,7 @@ import { api } from "../api.js";
 import Card from "../components/Card.jsx";
 import Input from "../components/Input.jsx";
 import Button from "../components/Button.jsx";
+import { applyThemeMode } from "../theme.js";
 
 export default function OptionsPage() {
   const [loading, setLoading] = useState(true);
@@ -14,6 +15,7 @@ export default function OptionsPage() {
   const [role, setRole] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
+  const [themeMode, setThemeMode] = useState("SYSTEM");
 
   async function loadProfile() {
     setLoading(true);
@@ -23,6 +25,7 @@ export default function OptionsPage() {
       setEmail(me.email || "");
       setRole(me.role || "");
       setFullName(me.fullName || "");
+      setThemeMode(me.themeMode || "SYSTEM");
     } catch (e) {
       setError(e.message);
     } finally {
@@ -43,6 +46,7 @@ export default function OptionsPage() {
     try {
       const body = {
         fullName: fullName.trim() ? fullName.trim() : null,
+        themeMode,
       };
       if (password.trim()) body.password = password.trim();
 
@@ -52,6 +56,7 @@ export default function OptionsPage() {
       });
 
       setPassword("");
+      applyThemeMode(themeMode);
       setSuccess("Setările au fost salvate.");
       await loadProfile();
     } catch (err) {
@@ -95,6 +100,19 @@ export default function OptionsPage() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Minim 6 caractere"
           />
+        </div>
+
+        <div>
+          <label className="text-xs text-white/70">Temă</label>
+          <select
+            value={themeMode}
+            onChange={(e) => setThemeMode(e.target.value)}
+            className="ui-input w-full rounded-md px-3 py-2 text-sm"
+          >
+            <option value="SYSTEM">Implicit (tema sistemului)</option>
+            <option value="LIGHT">Light</option>
+            <option value="DARK">Dark</option>
+          </select>
         </div>
 
         {error && (

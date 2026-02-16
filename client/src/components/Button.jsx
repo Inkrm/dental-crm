@@ -1,9 +1,9 @@
 const BASE =
-  "box-border border shadow-xs font-medium leading-5 rounded-base text-sm px-3 py-1 focus:outline-none focus:ring-4 inline-flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed";
+  "ui-btn box-border border shadow-xs font-medium leading-5 rounded-base text-sm px-3 py-1 focus:outline-none focus:ring-4 inline-flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed";
 
 const VARIANTS = {
   default:
-    "text-white bg-brand border-transparent hover:bg-brand-strong focus:ring-brand-medium",
+    "text-white bg-blue-700 border-transparent hover:bg-blue-800 focus:ring-blue-300",
   secondary:
     "text-body bg-neutral-secondary-medium border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-neutral-tertiary",
   tertiary:

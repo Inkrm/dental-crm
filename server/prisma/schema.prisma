@@ -22,6 +22,12 @@ enum Role {
   RECEPTION
 }
 
+enum ThemeMode {
+  SYSTEM
+  LIGHT
+  DARK
+}
+
 // statusurile posibile ale programarilor
 enum AppointmentStatus {
   PLANNED
@@ -36,6 +42,7 @@ model User {
   email        String   @unique
   passwordHash String
   role         Role     @default(RECEPTION)
+  themeMode    ThemeMode @default(SYSTEM)
   fullName     String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
