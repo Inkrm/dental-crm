@@ -7,7 +7,7 @@ function Item({ to, children }) {
     <NavLink
       to={to}
       className={({ isActive }) =>
-        "block rounded-xl px-3 py-2 text-sm " +
+        "flex items-center gap-2 rounded-xl px-3 py-2 text-sm " +
         (isActive ? "bg-white text-black" : "text-white/80 hover:bg-white/10")
       }
     >
@@ -30,15 +30,41 @@ export default function DashboardLayout() {
     <div className="min-h-screen bg-[#31314a] text-white">
       <div className="mx-auto p-4 md:p-6 grid gap-4 md:grid-cols-[240px_1fr]">
         <aside className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <div className="mb-4">
-            <div className="text-lg font-semibold">DENTAL CRM</div>
-            <div className="text-xs text-white/50">Sistem de Management</div>
+          <div className="mb-4 flex items-start justify-between">
+            <div>
+              <div className="text-lg font-semibold">DENTAL CRM</div>
+              <div className="text-xs text-white/50">Sistem de Management</div>
+            </div>
           </div>
 
           <nav className="grid gap-2">
-            <Item to="/patients">Pacienți</Item>
-            <Item to="/appointments">Programări</Item>
-            <Item to="/users">Utilizatori</Item>
+            <Item to="/patients">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
+                <img src="/icons/customer.png" alt="" className="h-5 w-5" />
+              </span>
+              Pacienți
+            </Item>
+
+            <Item to="/appointments">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
+                <img src="/icons/event.png" alt="" className="h-5 w-5" />
+              </span>
+              Programări
+            </Item>
+
+            <Item to="/users">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
+                <img src="/icons/user.png" alt="" className="h-5 w-5" />
+              </span>
+              Utilizatori
+            </Item>
+
+            <Item to="/options">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
+                <img src="/icons/setting.png" alt="" className="h-5 w-5" />
+              </span>
+              Setări
+            </Item>
           </nav>
 
           <button
@@ -48,7 +74,6 @@ export default function DashboardLayout() {
             Ieșire
           </button>
         </aside>
-
 
         <main className="rounded-2xl border border-white/10 bg-white/5 p-4 md:p-6">
           <Outlet />

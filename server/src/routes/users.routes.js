@@ -7,6 +7,49 @@ import { requireAuth, requireRole } from "../middleware/auth.js";
 const router = Router();
 router.use(requireAuth);
 
+router.get("/me", async (req, res) => {
+  const userId = req.user?.sub;
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, email: true, fullName: true, role: true, createdAt: true },
+  });
+
+  if (!user) return res.status(404).json({ error: "Not found" });
+  res.json(user);
+});
+
+const updateMeSchema = z.object({
+  fullName: z.string().min(1).optional().nullable(),
+  password: z.string().min(6).optional(),
+});
+
+router.put("/me", async (req, res) => {
+  const parsed = updateMeSchema.safeParse(req.body);
+  if (!parsed.success)
+    return res.status(400).json({ error: parsed.error.flatten() });
+
+  const userId = req.user?.sub;
+  const me = await prisma.user.findUnique({ where: { id: userId } });
+  if (!me) return res.status(404).json({ error: "Not found" });
+
+  const data = parsed.data;
+  const updateData = {
+    fullName: data.fullName === undefined ? undefined : data.fullName,
+  };
+
+  if (data.password) {
+    updateData.passwordHash = await bcrypt.hash(data.password, 10);
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: me.id },
+    data: updateData,
+    select: { id: true, email: true, fullName: true, role: true },
+  });
+
+  res.json(updated);
+});
+
 router.get("/doctors", async (req, res) => {
   const doctors = await prisma.user.findMany({
     where: { role: "DOCTOR" },
@@ -107,14 +150,6 @@ router.delete("/:id", requireRole("ADMIN"), async (req, res) => {
     const adminCount = await prisma.user.count({ where: { role: "ADMIN" } });
     if (adminCount <= 1) {
       return res.status(400).json({ error: "Cannot delete the last ADMIN" });
-    }
-  }
-  if (u.role === "ADMIN" && data.role && data.role !== "ADMIN") {
-    const adminCount = await prisma.user.count({ where: { role: "ADMIN" } });
-    if (adminCount <= 1) {
-      return res
-        .status(400)
-        .json({ error: "Cannot change role of the last ADMIN" });
     }
   }
   await prisma.user.delete({ where: { id: u.id } });
