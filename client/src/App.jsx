@@ -6,6 +6,7 @@ import AppointmentsPage from "./pages/AppointmentsPage.jsx";
 import RequireAuth from "./components/RequireAuth.jsx";
 import UsersPage from "./pages/UsersPage.jsx";
 import OptionsPage from "./pages/OptionsPage.jsx";
+import CalendarPage from "./pages/CalendarPage.jsx";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="appointments" element={<AppointmentsPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="options" element={<OptionsPage/>}/>
+        <Route path="calendar" element={<CalendarPage/>}/>
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

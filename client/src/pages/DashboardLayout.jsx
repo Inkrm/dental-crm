@@ -31,7 +31,7 @@ export default function DashboardLayout() {
         if (!active) return;
         applyThemeMode(me.themeMode || "SYSTEM");
       } catch {
-        // noop: fallback pe tema deja aplicata local
+        // fallback pe tema deja aplicata local
       }
     }
     loadMeTheme();
@@ -60,6 +60,13 @@ export default function DashboardLayout() {
           </div>
 
           <nav className="grid gap-2">
+            <Item to="/calendar">
+              <span className="nav-icon inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
+                <img src="/icons/calendar.png" alt="" className="h-5 w-5" />
+              </span>
+              Calendar
+            </Item>
+
             <Item to="/patients">
               <span className="nav-icon inline-flex h-8 w-8 items-center justify-center rounded-md bg-white">
                 <img src="/icons/customer.png" alt="" className="h-5 w-5" />

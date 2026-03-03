@@ -42,17 +42,14 @@ router.post("/", async (req, res) => {
   if (end <= start)
     return res.status(400).json({ error: "endTime must be after startTime" });
 
-  // cauta programari care se suprapun in interval
-  const items = await prisma.appointment.findMany({
+  // cauta programari ale aceluiasi doctor care se suprapun in interval
+  const overlap = await prisma.appointment.findFirst({
     where: {
-      startTime: { lt: to },
-      endTime: { gt: from },
+      doctorId,
+      startTime: { lt: end },
+      endTime: { gt: start },
+      status: { not: "CANCELLED" },
     },
-    include: {
-      patient: true,
-      doctor: { select: { id: true, email: true, fullName: true, role: true } },
-    },
-    orderBy: { startTime: "asc" },
   });
 
   // daca exista suprapunere, respinge cererea
