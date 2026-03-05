@@ -7,19 +7,15 @@ MVP web pentru administrare stomatologică.
 - Server: Node.js + Express + Prisma
 - DB: PostgreSQL
 
-## Rulare rapidă (Docker)
+## Prima rulare (Docker)
 ```bash
 docker compose up --build
 ```
 
-## Fără seed la startup
+## Startup
 ```bash
 SEED_ON_STARTUP=false docker compose up --build
 ```
-
-## URL-uri
-- Client: http://localhost:5173
-- API: http://localhost:4000
 
 ## Utilizatori seed (implicit)
 - `admin@local.com / admin123`
