@@ -11,7 +11,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d dentalcrm"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U postgres -d dentalcrm"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -27,10 +27,11 @@ services:
 
       DATABASE_URL: postgresql://postgres:postgres@db:5432/dentalcrm?schema=public
 
-      JWT_ACCESS_SECRET: change-me-access
-      JWT_REFRESH_SECRET: change-me-refresh
+      JWT_ACCESS_SECRET: 0a21d29f9407dd31a78d30f0a541c4142e9bfab02c9723c1d108344d04d3fced
+      JWT_REFRESH_SECRET: de1112ada693fc6235f5d6aa8ab6d4f3098c5a5f8c593e9ed6c99db4c1cc0b3d0d0ca4f6b7b71bb006b15e44400b840cbf08c9196038f9923b2307183849d10e
       ACCESS_TOKEN_TTL: 4h
       REFRESH_TOKEN_TTL: 30d
+      SEED_ON_STARTUP: ${SEED_ON_STARTUP:-true}
     depends_on:
       db:
         condition: service_healthy
