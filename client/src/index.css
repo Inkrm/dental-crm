@@ -94,3 +94,44 @@ html[data-theme="light"] [class*="bg-zinc-900"] {
 html[data-theme="light"] .nav-item:not(.is-active) .nav-icon {
   background: transparent !important;
 }
+
+@media (max-width: 768px) {
+  .crm-calendar {
+    border-radius: 0.75rem;
+    padding: 0.5rem;
+    background: rgb(255 255 255 / 0.04);
+  }
+
+  .crm-calendar .fc .fc-toolbar {
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .crm-calendar .fc .fc-toolbar-title {
+    font-size: 1rem;
+    line-height: 1.25rem;
+  }
+
+  .crm-calendar .fc .fc-button {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.82rem;
+    line-height: 1;
+  }
+
+  .crm-calendar .fc .fc-list {
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .crm-calendar .fc .fc-list-day-cushion,
+  .crm-calendar .fc .fc-list-event td,
+  .crm-calendar .fc .fc-list-empty {
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+  }
+
+  .crm-calendar .fc .fc-list-event-title,
+  .crm-calendar .fc .fc-list-event-time {
+    font-size: 0.9rem;
+  }
+}

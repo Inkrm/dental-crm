@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import listPlugin from "@fullcalendar/list";
 import roLocale from "@fullcalendar/core/locales/ro";
 import { api } from "../api.js";
 import Card from "../components/Card.jsx";
@@ -26,6 +27,7 @@ export default function CalendarPage() {
   const [items, setItems] = useState([]);
   const [error, setError] = useState("");
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   // incarca programarile si trateaza erorile de retea/API.
   async function load() {
@@ -40,6 +42,16 @@ export default function CalendarPage() {
 
   useEffect(() => {
     load();
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 768px)");
+    const syncMobile = (event) => setIsMobile(event.matches);
+
+    setIsMobile(mediaQuery.matches);
+    mediaQuery.addEventListener("change", syncMobile);
+
+    return () => mediaQuery.removeEventListener("change", syncMobile);
   }, []);
 
   // normalizeaza structura programarilor in formatul asteptat de FullCalendar.
@@ -99,8 +111,10 @@ export default function CalendarPage() {
         </div>
 
         <FullCalendar
-          plugins={[dayGridPlugin]}
-          initialView="dayGridMonth"
+          className="crm-calendar"
+          key={isMobile ? "calendar-mobile" : "calendar-desktop"}
+          plugins={[dayGridPlugin, listPlugin]}
+          initialView={isMobile ? "listWeek" : "dayGridMonth"}
           events={events}
           locales={[roLocale]}
           locale="ro"
@@ -109,13 +123,15 @@ export default function CalendarPage() {
           buttonText={{
             today: "Astazi",
             month: "Luna",
+            week: "Saptamana",
+            day: "Zi",
           }}
           // retinem evenimentul selectat pentru a afisa detalii sub calendar.
           eventClick={(info) => setSelectedEvent(info.event)}
           headerToolbar={{
             left: "prev,next today",
             center: "title",
-            right: "dayGridMonth",
+            right: isMobile ? "listWeek,dayGridDay" : "dayGridMonth,dayGridDay",
           }}
         />
       </Card>
