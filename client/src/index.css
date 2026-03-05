@@ -73,6 +73,11 @@ html[data-theme="light"] .ui-btn {
   color: #ffffff !important;
 }
 
+html[data-theme="light"] .ui-btn.bg-neutral-secondary-medium,
+html[data-theme="light"] .ui-btn.bg-warning {
+  color: #111827 !important;
+}
+
 html[data-theme="light"] [class*="bg-white/"] {
   background-color: rgb(248 250 252 / 0.95) !important;
 }

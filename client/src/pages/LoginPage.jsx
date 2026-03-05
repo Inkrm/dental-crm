@@ -9,8 +9,8 @@ export default function LoginPage() {
   // navigare dupa autentificare
   const nav = useNavigate();
   // valori implicite pentru demo
-  const [email, setEmail] = useState("admin@local.com"); // email valid!
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   // stare pentru mesaje si incarcare
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);

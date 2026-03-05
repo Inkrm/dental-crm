@@ -20,5 +20,5 @@ COPY src ./src
 
 EXPOSE 4000
 
-# la start: aplică migrații, rulează seed idempotent, apoi pornește serverul
-CMD ["sh", "-c", "npx prisma migrate deploy && node src/seed.js && node src/index.js"]
+# la start: asteapta DB (cu retry), aplica migratii, ruleaza seed idempotent, apoi porneste serverul
+CMD ["sh", "-c", "attempt=1; max=30; until npx prisma migrate deploy; do if [ \"$attempt\" -ge \"$max\" ]; then echo 'Database is still unreachable after retries.' >&2; exit 1; fi; echo \"Waiting for database... ($attempt/$max)\"; attempt=$((attempt+1)); sleep 2; done; node src/seed.js && node src/index.js"]
