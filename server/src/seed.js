@@ -10,7 +10,7 @@ async function main() {
       fullName: "Admin"
     },
     {
-      email: "doctor@local.com",
+      email: "dr.popescu@local.com",
       password: "doctor123",
       role: "DOCTOR",
       fullName: "Dr. Popescu"
