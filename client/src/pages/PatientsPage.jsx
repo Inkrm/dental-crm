@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { api } from "../api.js";
 import Card from "../components/Card.jsx";
 import Input from "../components/Input.jsx";
@@ -10,11 +10,15 @@ function PatientRow({ p, onChanged, onError, onDelete }) {
   const [lastName, setLastName] = useState(p.lastName);
   const [phone, setPhone] = useState(p.phone || "");
 
+  const startEditing = useCallback(() => {
+  setFirstName(p.firstName);
+  setLastName(p.lastName);
+  setPhone(p.phone || "");
+  }, [p.firstName, p.lastName, p.phone]);
+
   useEffect(() => {
-    setFirstName(p.firstName);
-    setLastName(p.lastName);
-    setPhone(p.phone || "");
-  }, [p.id, p.firstName, p.lastName, p.phone]);
+    startEditing();
+  }, [startEditing]);
 
   async function save() {
     try {
@@ -133,9 +137,7 @@ export default function PatientsPage() {
     // incarca lista de pacienti cu filtrare optionala
     setError("");
     try {
-      const data = await api(
-        `/patients${q ? `?q=${encodeURIComponent(q)}` : ""}`,
-      );
+      const data = await api(`/patients${q ? `?q=${encodeURIComponent(q)}` : ""}`);
       setPatients(data);
     } catch (e) {
       setError(e.message);

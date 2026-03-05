@@ -161,10 +161,10 @@ export default function CalendarPage() {
               {fmt(selectedEvent.end)}
             </div>
             {selectedEvent.extendedProps.reason && (
-              <div>
-                <span className="text-white/60">Motiv:</span>{" "}
-                {selectedEvent.extendedProps.reason}
-              </div>
+            <div>
+              <span className="text-white/60">Motiv:</span>{" "}
+              {selectedEvent.extendedProps.reason}
+            </div>
             )}
           </div>
         </Card>
