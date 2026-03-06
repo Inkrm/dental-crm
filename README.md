@@ -8,15 +8,16 @@ MVP web pentru administrare stomatologică.
 - DB: PostgreSQL
 
 ## Prima rulare (Docker)
-Pentru a rula aplicația pentru prima dată, folosiți comenzile:
+Pentru a porni aplicația pentru prima dată, executați mai întâi comanda (in SERVER si in CLIENT):
 ```bash
 npm i
 ```
-pentru a instala dependințele, in SERVER si in CLIENT,apoi:
-
+Aceasta va instala dependențele atât pentru SERVER, cât și pentru CLIENT.
+După, executați:
 ```bash
 docker compose up --build
 ```
+Această comandă va construi imaginile Docker și va porni aplicația.
 
 ## Startup
 ```bash
