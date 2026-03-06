@@ -36,5 +36,3 @@ Thumbs.db
 prisma/dev.db
 prisma/dev.db-journal
 
-# Local-only demo seed
-server/src/seed.demo.local.js
