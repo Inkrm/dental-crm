@@ -1,6 +1,6 @@
 # Dental CRM
 
-MVP web pentru administrare stomatologică.
+MVP web pentru administrare stomatologică. (NU ESTE PENTRU PRODUCȚIE!!!)
 
 ## Stack
 - Client: React + Vite
